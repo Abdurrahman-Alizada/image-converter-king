@@ -1,22 +1,18 @@
-import {PermissionsAndroid, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import {PermissionsAndroid, StyleSheet, View} from 'react-native';
+import React, {useState} from 'react';
 import PhotoEditor from '@baronha/react-native-photo-editor';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Button, useTheme} from 'react-native-paper';
 import {launchImageLibrary} from 'react-native-image-picker';
-
+import ConvertToOtherFormatAppbar from '../../../../components/Appbars/ConvertToOtherFormatAppbar';
 export default function ImageEditorIndex() {
   const theme = useTheme();
 
   const [isImageSelected, setIsImageSelected] = useState(false);
-  const [selectedImages, setselectedImages] = useState(null);
 
   const handleImagePicker = async () => {
+
     const options = {
-      // title: 'Select Image',
       mediaType: 'photo',
-      // presentationStyle: 'popover',
-    //   includeBase64: true,
       selectionLimit: 1,
       storageOptions: {
         skipBackup: true,
@@ -44,10 +40,9 @@ export default function ImageEditorIndex() {
           } else if (response.customButton) {
             console.log('User tapped custom button: ', response.customButton);
           } else {
-            console.log("first", response.assets[0].uri)
-            const editorOptions = {path : response.assets[0].uri} 
+            const editorOptions = {path: response.assets[0].uri};
             const result = await PhotoEditor.open(editorOptions);
-            console.log("first result", result)             
+            console.log('first result', result);
           }
         });
       } else {
@@ -60,6 +55,7 @@ export default function ImageEditorIndex() {
 
   return (
     <View style={{flex: 1, backgroundColor: theme.colors.background}}>
+      <ConvertToOtherFormatAppbar title="Edit image" />
       <View style={{}}>
         {!isImageSelected ? (
           <View style={{}}>

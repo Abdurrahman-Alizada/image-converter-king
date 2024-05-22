@@ -14,6 +14,7 @@ import {
 } from 'react-native-paper';
 import RNFS from 'react-native-fs';
 import ConvertToOtherFormatAppbar from '../../../../components/Appbars/ConvertToOtherFormatAppbar';
+import getPath from '../../../../utils/getPath';
 
 const ConvertToPDFIndex = () => {
   const theme = useTheme();
@@ -58,8 +59,14 @@ const ConvertToPDFIndex = () => {
     setIsLoading(true);
 
     try {
+      const pathDest = await getPath({
+        folderName: 'PDF',
+        fileName: outputFilename,
+        extention: 'pdf',
+      });
+      
       const uri = await createPdf({
-        outputPath: `${RNFS.DownloadDirectoryPath}/image-converter-king/${outputFilename}.pdf`,
+        outputPath: pathDest,
         pages: images,
       });
 
@@ -142,7 +149,7 @@ const ConvertToPDFIndex = () => {
             mode="contained"
             labelStyle={{fontSize: 18, fontWeight: '700'}}
             accessibilityLabel="Generate pdf">
-            Create
+            Create and download
           </Button>
         )}
 

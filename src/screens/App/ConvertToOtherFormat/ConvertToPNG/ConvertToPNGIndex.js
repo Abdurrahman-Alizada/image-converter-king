@@ -1,12 +1,13 @@
-import React, {useRef, useState} from 'react';
-import {View, Text, Image, PermissionsAndroid, ScrollView} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, Image, PermissionsAndroid, ScrollView, Alert} from 'react-native';
 import ConvertToOtherFormatAppbar from '../../../../components/Appbars/ConvertToOtherFormatAppbar';
 import {useTheme, Button, ActivityIndicator, Icon, Snackbar} from 'react-native-paper';
 import {launchImageLibrary} from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import formatFileSize from '../../../../utils/formatFileSize';
+import getPath from '../../../../utils/getPath';
 
-const ConvertToPNGIndex = ({route, navigation}) => {
+const ConvertToPNGIndex = () => {
   const theme = useTheme();
   const [isImageSelected, setIsImageSelected] = useState(false);
   const [selectedImages, setselectedImages] = useState(null);
@@ -14,12 +15,11 @@ const ConvertToPNGIndex = ({route, navigation}) => {
   const [isImageConversionComplete, setIsImageConversionComplete] = useState(false);
   const [imageDownloadSuccessfully, setImageDownloadSuccessfully] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [convertedImages, setConvertedImages] = useState([]);
 
   const handleImagePicker = async () => {
     const options = {
-      // title: 'Select Image',
       mediaType: 'photo',
-      // presentationStyle: 'popover',
       includeBase64: true,
       selectionLimit: 3,
       storageOptions: {
@@ -60,39 +60,21 @@ const ConvertToPNGIndex = ({route, navigation}) => {
     }
   };
 
-  const convertAndSaveToPNG = async () => {
+  const convertToPNG = async () => {
     setConvertLoading(true);
-    const folderName = 'image-converter-king';
 
     try {
-      const downloadDirPath = RNFS.DownloadDirectoryPath;
-      const folderPath = `${downloadDirPath}/${folderName}`;
-      const folderExists = await RNFS.exists(folderPath);
-      if (!folderExists) {
-        await RNFS.mkdir(folderPath);
-      }
-
-      let convertedImagesData = [];
-
       for (let i = 0; i < selectedImages.length; i++) {
-        const base64Data = selectedImages[i].base64;
-
-        let fileName = `${selectedImages[i].fileName.split('.')[0]}.png`;
-        let filePath = `${folderPath}/${fileName}`;
-        let fileExists = await RNFS.exists(filePath);
-
-        let count = 1;
-        while (fileExists) {
-          fileName = `${selectedImages[i].fileName.split('.')[0]} (${count}).png`;
-          filePath = `${folderPath}/${fileName}`;
-          fileExists = await RNFS.exists(filePath);
-          count++;
-        }
-        convertedImagesData.push({filePath, base64Data});
+        const destPath = await getPath({
+          folderName: 'PNG',
+          fileName: selectedImages[i].fileName.split('.')[0],
+          extention: 'png',
+        });
+        setConvertedImages([
+          ...convertedImages,
+          {filePath: destPath, base64Data: selectedImages[i].base64},
+        ]);
       }
-
-      await AsyncStorage.setItem('convertedImages', JSON.stringify(convertedImagesData));
-      convertedImagesData=null
     } catch (error) {
       console.error('Error creating folder or writing file:', error);
     }
@@ -102,12 +84,19 @@ const ConvertToPNGIndex = ({route, navigation}) => {
 
   const handleDownloadToGallery = async () => {
     try {
-      const convertedImagesData = await AsyncStorage.getItem('convertedImages');
-      if (convertedImagesData) {
-        const images = JSON.parse(convertedImagesData);
-        for (let i = 0; i < images.length; i++) {
-          await saveImageToGallery(images[i].filePath, images[i].base64Data);
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        for (let i = 0; i < convertedImages.length; i++) {
+          await RNFS.writeFile(
+            convertedImages[i].filePath,
+            convertedImages[i].base64Data,
+            'base64',
+          );
         }
+      } else {
+        Alert.alert('Permission Denied', 'Unable to save images without permission');
       }
       setImageDownloadSuccessfully(true);
       setVisible(true);
@@ -116,34 +105,13 @@ const ConvertToPNGIndex = ({route, navigation}) => {
     }
   };
 
-  const saveImageToGallery = async (filePath, base64Data) => {
-    try {
-      await RNFS.writeFile(filePath, base64Data, 'base64');
-    } catch (error) {
-      console.error('Error saving image to gallery:', error);
-    }
-  };
-
-  const furtherActions = [
-    {icon: 'image-edit-outline', name: 'Edit', navigateTo: 'EditingScreen'},
-    {icon: 'arrow-collapse-all', name: 'Compress', navigateTo: 'EditingScreen'},
-    {icon: 'resize', name: 'Resize', navigateTo: 'EditingScreen'},
-    {icon: 'folder-zip-outline', name: 'Zip', navigateTo: 'EditingScreen'},
-    {icon: 'share-variant-outline', name: 'Share', navigateTo: 'EditingScreen'},
-  ];
-
-  // Function to convert file size to human-readable format
-  const formatFileSize = sizeInBytes => {
-    if (sizeInBytes >= 1024 * 1024 * 1024) {
-      return `${(sizeInBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-    } else if (sizeInBytes >= 1024 * 1024) {
-      return `${(sizeInBytes / (1024 * 1024)).toFixed(2)} MB`;
-    } else if (sizeInBytes >= 1024) {
-      return `${(sizeInBytes / 1024).toFixed(2)} KB`;
-    } else {
-      return `${sizeInBytes} Bytes`;
-    }
-  };
+  // const furtherActions = [
+  //   {icon: 'image-edit-outline', name: 'Edit', navigateTo: 'EditingScreen'},
+  //   {icon: 'arrow-collapse-all', name: 'Compress', navigateTo: 'EditingScreen'},
+  //   {icon: 'resize', name: 'Resize', navigateTo: 'EditingScreen'},
+  //   {icon: 'folder-zip-outline', name: 'Zip', navigateTo: 'EditingScreen'},
+  //   {icon: 'share-variant-outline', name: 'Share', navigateTo: 'EditingScreen'},
+  // ];
 
   return (
     <View style={{flexGrow: 1, backgroundColor: theme.colors.background}}>
@@ -193,7 +161,7 @@ const ConvertToPNGIndex = ({route, navigation}) => {
                   * Your images downloaded to Download/image-converter-king folder
                 </Text>
               )}
-              <View
+              {/* <View
                 style={{
                   backgroundColor: theme.colors.greyLight,
                   flexDirection: 'row',
@@ -210,7 +178,7 @@ const ConvertToPNGIndex = ({route, navigation}) => {
                     <Text style={{fontSize: 18}}>{furtherAction.name}</Text>
                   </View>
                 ))}
-              </View>
+              </View> */}
             </View>
           ) : (
             <View style={{flexGrow: 1}}>
@@ -230,15 +198,30 @@ const ConvertToPNGIndex = ({route, navigation}) => {
               ) : (
                 <View style={{flex: 1, marginVertical: '5%', alignItems: 'center'}}>
                   {selectedImages.map((selectedImage, index) => (
-                    <Image
-                      key={index}
-                      style={{
-                        width: 300,
-                        height: 350,
-                        marginBottom: 5,
-                      }}
-                      source={{uri: selectedImage?.uri}}
-                    />
+                    <View key={index}>
+                      <Image
+                        style={{
+                          width: 250,
+                          height: 300,
+                          marginBottom: 5,
+                        }}
+                        source={{uri: selectedImage?.uri}}
+                      />
+                      <View style={{marginVertical: '3%'}}>
+                        <Text style={{}}>
+                          <Text style={{fontWeight: 'bold'}}>Name: </Text>
+                          {selectedImage.fileName}
+                        </Text>
+                        <Text style={{}}>
+                          <Text style={{fontWeight: 'bold'}}>Dimensions:</Text>{' '}
+                          {selectedImage.width} x {selectedImage.height}
+                        </Text>
+                        <Text style={{}}>
+                          <Text style={{fontWeight: 'bold'}}>Size: </Text>
+                          {formatFileSize(selectedImage.fileSize)}
+                        </Text>
+                      </View>
+                    </View>
                   ))}
                 </View>
               )}
@@ -256,7 +239,7 @@ const ConvertToPNGIndex = ({route, navigation}) => {
             </View>
           ) : (
             <Button
-              onPress={convertAndSaveToPNG}
+              onPress={convertToPNG}
               style={{marginVertical: '5%', width: '80%'}}
               contentStyle={{padding: '3%'}}
               theme={{roundness: 20}}

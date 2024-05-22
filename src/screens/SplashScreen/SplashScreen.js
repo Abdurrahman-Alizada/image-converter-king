@@ -1,8 +1,9 @@
 // Import React and Component
 import React, {useLayoutEffect, useEffect, useRef, useState} from 'react';
-import {View, ActivityIndicator, Image, Text} from 'react-native';
+import {View, ActivityIndicator, Image, Text, StatusBar, SafeAreaView} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {version} from '../../../package.json';
+import { useTheme } from 'react-native-paper';
 
 const SplashScreen = ({navigation}) => {
 
@@ -31,13 +32,19 @@ const SplashScreen = ({navigation}) => {
           }, 2000);
   }, []);
 
+  const theme = useTheme()
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: theme.colors.background
       }}>
+        <StatusBar
+        barStyle={'dark-content'}
+        backgroundColor={theme.colors.background}
+      />
       <View
         style={{
           flex: 0.95,
@@ -49,14 +56,15 @@ const SplashScreen = ({navigation}) => {
             width: 150,
             height: 150,
           }}
-          source={require('../../assets/onboarding/1.png')}
+          source={require('../../assets/onboarding/playstore-icon.png')}
         />
-        <ActivityIndicator />
+        <Text style={{fontSize:18}}>Image converter - king</Text>
+        {/* <ActivityIndicator /> */}
       </View>
       <Text style={{fontWeight: 'bold'}}>
         V {version}
       </Text>
-    </View>
+    </SafeAreaView>
   );
 };
 

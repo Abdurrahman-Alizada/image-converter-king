@@ -22,12 +22,22 @@ const Slide = ({item}) => {
       <View style={{width: width * 0.9}}>
         <Text
           style={{
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: 'bold',
             textAlign: 'center',
             lineHeight: 31,
+            marginTop:"5%"
           }}>
           {item?.title}
+        </Text>
+        <Text
+          style={{
+            fontSize: 18,
+            // fontWeight: 'bold',
+            textAlign: 'center',
+            lineHeight: 31,
+          }}>
+          {item?.desc}
         </Text>
       </View>
     </View>
@@ -98,7 +108,7 @@ const OnboardingScreen = ({navigation}) => {
             <View style={{height: 50}}>
               <TouchableOpacity
                 style={[styles.btn, {}]}
-                onPress={() => navigation.replace('Auth')}>
+                onPress={() => navigation.replace('Main')}>
                 <Text
                   style={{
                     fontWeight: 'bold',
