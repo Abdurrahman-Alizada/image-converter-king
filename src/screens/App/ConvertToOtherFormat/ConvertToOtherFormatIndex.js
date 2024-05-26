@@ -1,10 +1,9 @@
-import React, {useRef, useState} from 'react';
+import React, { useState} from 'react';
 import {View, Text, Image, PermissionsAndroid} from 'react-native';
 import ConvertToOtherFormatAppbar from '../../../components/Appbars/ConvertToOtherFormatAppbar';
 import {useTheme, Button} from 'react-native-paper';
 import {launchImageLibrary} from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
-import {encode, decode} from 'js-base64';
 
 const ConvertToOtherFormatIndex = ({route, navigation}) => {
   const theme = useTheme();
@@ -58,20 +57,6 @@ const ConvertToOtherFormatIndex = ({route, navigation}) => {
       console.warn(err);
     }
   };
-
-  // const convertAndSaveToPNG = async () => {
-  //   // const folderPath = `${RNFS.DownloadDirectoryPath}/${`image convert King`}`;
-  //   const folderExists = await RNFS.exists(folderPath);
-  //   if (!folderExists) {
-  //     await RNFS.mkdir(folderPath);
-  //   }
-  //   let filePath = `${RNFS.DownloadDirectoryPath}/${fileName}`;
-  //   // Generate unique file name
-  //   let fileName = `image_${i}.png`;
-  //   let fileExists = await RNFS.exists(filePath);
-  //   const filePath = `${RNFS.DownloadDirectoryPath}/image convert King/image_${`12`}.png`;
-  //   await RNFS.writeFile(filePath, selectedImage.base64, 'base64');
-  // };
 
   const convertAndSaveToPNG = async () => {
     const folderName = 'image-converter-king';
