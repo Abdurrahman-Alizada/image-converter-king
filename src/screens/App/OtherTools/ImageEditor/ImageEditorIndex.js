@@ -4,13 +4,14 @@ import PhotoEditor from '@baronha/react-native-photo-editor';
 import {Button, useTheme} from 'react-native-paper';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ConvertToOtherFormatAppbar from '../../../../components/Appbars/ConvertToOtherFormatAppbar';
+import Stickers from '../../../../utils/stickers.json';
+
 export default function ImageEditorIndex() {
   const theme = useTheme();
 
   const [isImageSelected, setIsImageSelected] = useState(false);
 
   const handleImagePicker = async () => {
-
     const options = {
       mediaType: 'photo',
       selectionLimit: 1,
@@ -40,8 +41,12 @@ export default function ImageEditorIndex() {
           } else if (response.customButton) {
             console.log('User tapped custom button: ', response.customButton);
           } else {
-            const editorOptions = {path: response.assets[0].uri};
-            const result = await PhotoEditor.open(editorOptions);
+            const editorOptions = {path: response.assets[0].uri, Stickers};
+            const result = await PhotoEditor.open({
+              path: response.assets[0].uri,
+              // path: photo.path,
+              stickers: Stickers,
+            });
             console.log('first result', result);
           }
         });
