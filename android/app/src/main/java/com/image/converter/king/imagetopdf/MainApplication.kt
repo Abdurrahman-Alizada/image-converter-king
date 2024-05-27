@@ -1,4 +1,4 @@
-package com.imageconverter
+package com.image.converter.king.imagetopdf
 
 import android.app.Application
 import com.facebook.react.PackageList

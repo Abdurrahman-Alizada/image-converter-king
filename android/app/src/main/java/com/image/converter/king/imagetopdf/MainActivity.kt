@@ -1,4 +1,4 @@
-package com.imageconverter
+package com.image.converter.king.imagetopdf
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
