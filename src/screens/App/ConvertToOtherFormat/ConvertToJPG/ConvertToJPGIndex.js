@@ -153,9 +153,10 @@ const ConvertToJPGIndex = () => {
                 labelStyle={{fontSize: 18, fontWeight: '700'}}
                 icon={'download'}
                 disabled={imageDownloadSuccessfully}
-                accessibilityLabel="Select image button">
+                accessibilityLabel="Download image">
                 Download
               </Button>
+
               {imageDownloadSuccessfully && (
                 <Text style={{marginTop: '5%'}}>
                   * Your images downloaded to Download/image-converter-king folder

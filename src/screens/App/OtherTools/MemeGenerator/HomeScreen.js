@@ -2,7 +2,6 @@
 import React, {useState} from 'react';
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   Image,
@@ -11,7 +10,7 @@ import {
   FlatList,
 } from 'react-native';
 import ResultScreen from './ResultScreen';
-import {Button, Icon} from 'react-native-paper';
+import {Button} from 'react-native-paper';
 
 const deviceWidth = Dimensions.get('window').width;
 const widthHalves = deviceWidth / 3;
@@ -123,7 +122,6 @@ const MEMES = [
   'elf',
   'chosen',
 ];
-
 const MEMELIST = MEMES.map((meme, i) => ({id: i, meme}));
 
 const HomeScreen = () => {
@@ -146,25 +144,23 @@ const HomeScreen = () => {
 
   const renderItem = ({item}) => {
     return (
-      <TouchableOpacity onPress={() => setActiveMeme(item.meme)}>
+      <TouchableOpacity
+        onPress={() => setActiveMeme(item.meme)}
+        accessibilityLabel={`Meme option: ${item.meme}`}
+        accessibilityRole="button">
         <View style={styles.memeBlock}>
           <Image
             source={{uri: `http://memegen.link/${item.meme}/_.jpg?preview=true&height=50`}}
             style={styles.memeImage}
+            accessibilityLabel={`Image of meme: ${item.meme}`}
           />
-          {activeMeme == item.meme ? (
+          {activeMeme === item.meme && (
             <View
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                borderWidth: 5,
-                borderColor: '#ff0',
-              }}
+              style={styles.selectedMeme}
+              accessibilityLabel={`Selected meme: ${item.meme}`}
+              accessibilityRole="image"
             />
-          ) : null}
+          )}
         </View>
       </TouchableOpacity>
     );
@@ -172,30 +168,20 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* <View style={{flexDirection:"row",alignItems:"center",justifyContent:"center", height: 50}}>
-        <Icon
-          source="arrow-left"
-          // color={MD3Colors.error50}
-          size={20}
-        />
-        <Image
-          source={require('../../../../assets/onboarding/header.png')}
-          resizeMode={'contain'}
-          style={{width: "90%", height: 80}}
-        />
-      </View> */}
-      <View style={{marginVertical: '5%'}}>
+      <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
           value={top}
           onChangeText={setTop}
           placeholder={'Input top text here'}
+          accessibilityLabel="Top text input"
         />
         <TextInput
           style={styles.input}
           value={bottom}
           onChangeText={setBottom}
           placeholder={'Input bottom text here'}
+          accessibilityLabel="Bottom text input"
         />
       </View>
       <FlatList
@@ -204,16 +190,20 @@ const HomeScreen = () => {
         numColumns={3}
         keyExtractor={item => item.id.toString()}
       />
+      {!showResult && (
+        <Button
+          disabled={!top && !bottom}
+          onPress={() => setShowResult(true)}
+          mode="contained"
+          style={styles.generateButton}
+          contentStyle={styles.generateButtonContent}
+          theme={{roundness: 20}}
+          accessibilityLabel="Generate meme button"
+          accessibilityRole="button">
+          🐶 Generate
+        </Button>
+      )}
 
-      <Button
-      disabled={!top && !bottom}
-        onPress={() => setShowResult(true)}
-        mode="contained"
-        style={{margin: 15}}
-        contentStyle={{padding: '3%'}}
-        theme={{roundness: 20}}>
-        🐶 Generate
-      </Button>
       {showResult && (
         <ResultScreen
           top={processText(top)}
@@ -232,16 +222,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  inputContainer: {
+    marginVertical: '5%',
+  },
   input: {
     margin: 10,
     borderWidth: 1,
     borderRadius: 4,
     borderColor: '#ddd',
     paddingHorizontal: 15,
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
   },
   memeBlock: {
     justifyContent: 'center',
@@ -252,6 +241,21 @@ const styles = StyleSheet.create({
   memeImage: {
     width: widthHalves,
     height: widthHalves,
+  },
+  selectedMeme: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderWidth: 5,
+    borderColor: '#ff0',
+  },
+  generateButton: {
+    margin: 15,
+  },
+  generateButtonContent: {
+    padding: '3%',
   },
 });
 

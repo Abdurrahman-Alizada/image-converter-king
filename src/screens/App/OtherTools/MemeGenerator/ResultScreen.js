@@ -1,23 +1,19 @@
 // ResultScreen.js
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Image,
   StyleSheet,
-  CameraRoll,
   Dimensions,
   ActivityIndicator,
-  TouchableOpacity,
-  Text,
   Alert,
 } from 'react-native';
-// import { saveImage } from './utils'; // Assuming saveImage function is implemented in utils.js
 import RNFS from 'react-native-fs';
-import {Button} from 'react-native-paper';
+import { Button } from 'react-native-paper';
 
 const deviceWidth = Dimensions.get('window').width;
 
-const ResultScreen = ({top, bottom, meme, showResult, onToggleResult}) => {
+const ResultScreen = ({ top, bottom, meme, showResult, onToggleResult }) => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -29,7 +25,7 @@ const ResultScreen = ({top, bottom, meme, showResult, onToggleResult}) => {
   const handleSaveImage = async () => {
     try {
       const uri = `http://memegen.link/${meme}/${top}/${bottom}.jpg`;
-      await saveImage(uri, top, bottom); // Utilize a function to save the image
+      await saveImage(uri, top, bottom);
     } catch (error) {
       console.error('Error saving image:', error);
     }
@@ -44,26 +40,21 @@ const ResultScreen = ({top, bottom, meme, showResult, onToggleResult}) => {
       }
       const fileName = `${top}_${bottom}.jpg`;
 
-      // Create the destination path
       let destination = `${path}/${fileName}`;
-
-      // Check if the file already exists
       let fileExists = await RNFS.exists(destination);
       let count = 1;
       while (fileExists) {
-        // Append a number to the file name if it already exists
         destination = `${path}/${top}_${bottom}(${count}).jpg`;
         fileExists = await RNFS.exists(destination);
         count++;
       }
 
-      // Download the image
       const downloadOptions = {
         fromUrl: uri,
         toFile: destination,
-        background: true, // Download in the background even if the app is closed
-        progressDivider: 1, // Report progress in 1% increments
-        progressInterval: 1000, // Report progress every second
+        background: true,
+        progressDivider: 1,
+        progressInterval: 1000,
       };
 
       const downloadResult = await RNFS.downloadFile(downloadOptions).promise;
@@ -82,35 +73,41 @@ const ResultScreen = ({top, bottom, meme, showResult, onToggleResult}) => {
 
   return (
     <View style={styles.container}>
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={styles.imageContainer}>
         {!loaded && <ActivityIndicator />}
         <Image
-          source={{uri: `http://memegen.link/${meme}/${top}/${bottom}.jpg`}}
+          source={{ uri: `http://memegen.link/${meme}/${top}/${bottom}.jpg` }}
           resizeMode={'contain'}
-          style={{width: deviceWidth, height: deviceWidth}}
+          style={styles.image}
           onLoad={() => setLoaded(true)}
         />
       </View>
 
       {loaded && (
-        <Button
-          onPress={handleSaveImage}
-          mode="contained"
-          style={{margin: 15}}
-          contentStyle={{padding: '3%'}}
-          theme={{roundness: 20}}>
-          💾 Save
-        </Button>
-      )}
+        <View style={styles.buttonsContainer}>
+          <Button
+            onPress={handleSaveImage}
+            mode="contained"
+            style={styles.button}
+            contentStyle={styles.buttonContent}
+            theme={{ roundness: 20 }}
+            accessibilityLabel="Save image button"
+          >
+            💾 Save
+          </Button>
 
-      <Button
-        onPress={onToggleResult}
-        mode="contained"
-        style={{margin: 15}}
-        contentStyle={{padding: '3%'}}
-        theme={{roundness: 20}}>
-        💩 Generate Again
-      </Button>
+          <Button
+            onPress={onToggleResult}
+            mode="contained"
+            style={styles.button}
+            contentStyle={styles.buttonContent}
+            theme={{ roundness: 20 }}
+            accessibilityLabel="Generate again button"
+          >
+            💩 Generate Again
+          </Button>
+        </View>
+      )}
     </View>
   );
 };
@@ -125,15 +122,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',
   },
-  button: {
-    margin: 10,
-    backgroundColor: '#01afee',
-    padding: 15,
-    borderRadius: 4,
+  imageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
+  image: {
+    width: deviceWidth,
+    height: deviceWidth,
+  },
+  buttonsContainer: {
+    padding: 15,
+  },
+  button: {
+    marginVertical: 10,
+  },
+  buttonContent: {
+    padding: '3%',
   },
 });
 

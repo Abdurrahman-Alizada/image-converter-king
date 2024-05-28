@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const ImageCompressorIndex = () => {
   const theme = useTheme();
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const [imageUri, setImageUri] = useState(null);
   const [image, setImage] = useState(null);
@@ -58,6 +58,7 @@ const ImageCompressorIndex = () => {
       Alert.alert('Error', 'Failed to compress image. Please try again.');
     }
   };
+  
   const getImageSize = path => {
     return new Promise((resolve, reject) => {
       Image.getSize(
@@ -79,7 +80,7 @@ const ImageCompressorIndex = () => {
         const filePath = await getPath();
         await RNFS.copyFile(imageUri, filePath);
         Alert.alert('Success', `Image saved successfully in download folder`);
-        navigation.goBack()
+        navigation.goBack();
       } else {
         Alert.alert('Permission Denied', 'Unable to save image without permission');
       }
@@ -153,20 +154,19 @@ const ImageCompressorIndex = () => {
               <Image
                 style={{height: 300, marginBottom: 5, resizeMode: "center"}}
                 source={{uri: imageUri}}
-
               />
               <View style={{marginTop: '3%'}}>
                 <Text style={{marginBottom: '2%'}}>
                   {!isDownloadShow ? 'Original' : 'Resized'} image
                 </Text>
-                <Text style={{}}>
+                <Text>
                   <Text style={{fontWeight: 'bold'}}>Name:</Text> {image.fileName}
                 </Text>
-                <Text style={{}}>
+                <Text>
                   <Text style={{fontWeight: 'bold'}}>Dimensions:</Text> {image.width} x{' '}
                   {image.height}{' '}
                 </Text>
-                <Text style={{}}>
+                <Text>
                   <Text style={{fontWeight: 'bold'}}>Size:</Text> {formatFileSize(image.fileSize)}{' '}
                 </Text>
               </View>
@@ -196,7 +196,7 @@ const ImageCompressorIndex = () => {
                 theme={{roundness: 20}}
                 mode="contained"
                 labelStyle={{fontSize: 18, fontWeight: '700'}}
-                accessibilityLabel="Download image button">
+                accessibilityLabel="Download image">
                 Download Image
               </Button>
             ) : (
@@ -207,11 +207,10 @@ const ImageCompressorIndex = () => {
                 theme={{roundness: 20}}
                 mode="contained"
                 labelStyle={{fontSize: 18, fontWeight: '700'}}
-                accessibilityLabel="Compress image button">
+                accessibilityLabel="Compress image">
                 Compress Image
               </Button>
             )}
-            
           </>
         ) : (
           <Button
@@ -221,7 +220,7 @@ const ImageCompressorIndex = () => {
             theme={{roundness: 20}}
             mode="contained"
             labelStyle={{fontSize: 18, fontWeight: '700'}}
-            accessibilityLabel="Select image button">
+            accessibilityLabel="Select image">
             Select Image
           </Button>
         )}

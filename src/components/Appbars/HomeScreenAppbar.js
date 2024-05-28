@@ -22,12 +22,16 @@ const HomeScreenAppbar = ({title, isElevated = true}) => {
         icon="menu"
         color={theme.colors.onBackground}
         onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+        accessibilityLabel="Open navigation drawer"
+        accessibilityRole="button"
       />
       <Appbar.Content
         title={title}
         titleStyle={{
           color: theme.colors.onBackground,
         }}
+        accessibilityLabel={`Screen title: ${title}`}
+        accessibilityRole="header"
       />
     </Appbar.Header>
   );

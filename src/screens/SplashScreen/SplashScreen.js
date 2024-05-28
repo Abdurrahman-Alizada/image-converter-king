@@ -29,7 +29,7 @@ const SplashScreen = ({navigation}) => {
             isAppFirstLaunched?.current
               ? navigation.replace('Onboarding')
               : navigation.replace('Main');
-          }, 2000);
+          }, 500);
   }, []);
 
   const theme = useTheme()

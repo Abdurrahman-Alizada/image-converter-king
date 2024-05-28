@@ -28,11 +28,6 @@ export const Main = () => {
                   component={SplashScreen}
                   options={{headerShown: false}}
                 />
-                {/* <Stack.Screen
-                  name="Auth"
-                  component={Auth}
-                  options={{headerShown: false}}
-                /> */}
                 <Stack.Screen
                   name="Onboarding"
                   component={Onboarding}
